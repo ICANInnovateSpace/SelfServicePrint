@@ -13,7 +13,6 @@
     
     </div>
         <asp:Label ID="Label1" runat="server" Text="支付成功"></asp:Label>
-        <asp:Label ID="Label2" runat="server" Text="Label"></asp:Label>
     </form>
 </body>
 </html>

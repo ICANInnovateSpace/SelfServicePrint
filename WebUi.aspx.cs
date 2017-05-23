@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -14,7 +15,8 @@ public partial class WebUi : System.Web.UI.Page
     int pages = 0;
     protected void Page_Load(object sender, EventArgs e)
     {
-
+      this.FileUpload1.Style.Add("display", "none");
+     
     }
     /**
      * 上传和跳转页面的点击事件
@@ -23,6 +25,8 @@ public partial class WebUi : System.Web.UI.Page
      */
     protected void Button1_Click(object sender, EventArgs e)
     {
+
+     
         //判断是否有浏览文件
         if (FileUpload1.HasFile)
         {
@@ -32,13 +36,13 @@ public partial class WebUi : System.Web.UI.Page
             System.IO.FileInfo file = new System.IO.FileInfo(FileUpload1.PostedFile.FileName);
 
             //判断是否是.doc或者.docx格式的文件
-
+        
            if (file.Extension == ".doc" || file.Extension == ".docx")
             {
                 //是，则对该文件进行统计页数
                 PageCount pagecount = new PageCount();
                 pages=  pagecount.GetWordPageCount(Server.MapPath("~/") + FileUpload1.FileName);
-
+                upload();
             }
            //判断是否是.pdf格式的文件
             else if(file.Extension == ".pdf")
@@ -46,19 +50,45 @@ public partial class WebUi : System.Web.UI.Page
                 //是，则对该文件进行计算
                 PageCount pagecount = new PageCount();
                 pages = pagecount.GetPDFPageCountByDll(Server.MapPath("~/") + FileUpload1.FileName);
+                upload();
             }
-             //通过label来显示页数
-             Label1.Text = "上传成功！"+pages;
-            string WebUi_url;
+            else
+            {
+                Response.Write("<script>alert('只允许打印.doc 、.docx、 .pdf文件~！!')</script>");
+                File.Delete(@"F:\selPrint\" + FileUpload1.FileName);
+            }
 
-            //跳转的url以及对象需要传递的参数
-            WebUi_url = "PayUi.aspx?pages=" +pages+"&path=" + FileUpload1.FileName;
-
-            //传递参数
-            Response.Redirect(WebUi_url);
-            //Session["path"]= Server.MapPath("~/") + FileUpload1.FileName;
-            //页面跳转到PayUi.aspx
-            Server.Transfer("PayUi.aspx");
         }
+        else
+        {
+            Response.Write("<script>alert('请浏览打印文件~！!')</script>");
+        }
+
     }
+    //实现页面的跳转以及传递参数
+    private void upload()
+    {
+        //通过label来显示页数
+        Label1.Text = "上传成功！" + pages;
+        string WebUi_url;
+
+        //跳转的url以及对象需要传递的参数
+        WebUi_url = "Setting.aspx?pages=" + pages + "&path=" + FileUpload1.FileName;
+
+        //传递参数
+        Response.Redirect(WebUi_url);
+        //Session["path"]= Server.MapPath("~/") + FileUpload1.FileName;
+        //页面跳转到PayUi.aspx
+        Server.Transfer("Setting.aspx");
+    }
+
+    protected void Button3_Click(object sender, EventArgs e)
+    {
+        
+        //this.FileUpload1.Style.Add("display", "none");
+    }
+
+
+
+ 
 }

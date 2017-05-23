@@ -26,15 +26,41 @@ public partial class PayUi : System.Web.UI.Page
     WxPayData result;
     public string path;
     private string out_trade_no1 = null;//用来接收商品号
+
+    public string PrintType;//单双面
+    public string PrintColor;//彩色黑白
     protected void Page_Load(object sender, EventArgs e)
     {
         //接收从WebUi.aspx传过来的pages参数
         int pages=int.Parse(Request.QueryString["pages"]);
+        Label3.Text =  pages.ToString();
         //本地文件的路径
         path = Request.QueryString["path"];
+        //获取传递过来的单/双
+        PrintType = Request.QueryString["PrintType"];
+        //获取黑白/彩色
+        PrintColor = Request.QueryString["PrintColor"];
         NativePay nativePay = new NativePay();
         //生成扫码支付模式二url
-        //page * 15 为了测试改成1
+
+        //传递到微信后台的参数
+        int price=1;
+        //显示价格的参数
+        double showprice = 0;
+        if(PrintColor.Equals("0"))
+        {
+            price = pages * 15;
+            showprice = pages * 0.15;
+        }else
+        {
+            price = pages * 100;
+            showprice = pages * 1;
+        }
+        //显示页数
+        lb_page.Text = pages.ToString();
+        //显示价格
+        lb_Money.Text = showprice.ToString();
+        //price 为了测试改成1
         WxPayData wx = nativePay.GetPayUrl(1, "123456789", "商品名称", "商品标记", "商品描述");
         WxPayData result = new WxPayData();
         result.SetValue("appid",wx.GetValue("appid"));
