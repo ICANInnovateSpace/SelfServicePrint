@@ -1,4 +1,4 @@
-﻿using Microsoft.Office.Interop.Word;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Drawing.Printing;
 using O2S.Components.PDFRender4NET.Printing;
 using O2S.Components.PDFRender4NET;
+using Microsoft.Office.Interop.Word;
 
 public partial class Printui : System.Web.UI.Page
 {  
@@ -31,6 +32,9 @@ public partial class Printui : System.Web.UI.Page
         PrintType = Request.QueryString["PrintType"];
         //获取黑白/彩色
         PrintColor = Request.QueryString["PrintColor"];
+
+        //ConvertWordPDF1(@"F:\selPrint\" + path1, @"F:\selPrint\" + path1 + ".pdf");
+            
         if (path1 != null)
         {
             //通过路径来获取文件对象
@@ -40,7 +44,7 @@ public partial class Printui : System.Web.UI.Page
             {
                
                 //调用printfirst进行打印
-                printfirst(@"F:\selPrint\" + path1);
+               // printfirst(@"F:\selPrint\" + path1);
                 //打印完后删除文件
                 File.Delete(@"F:\selPrint\" + path1);
             }
@@ -98,6 +102,7 @@ public partial class Printui : System.Web.UI.Page
 
         //先保存默认的打印机
         string defaultPrinter = appWord.ActivePrinter;
+        
 
         //打印设置属性
         PrinterSettings settings = new PrinterSettings();
@@ -183,12 +188,61 @@ public partial class Printui : System.Web.UI.Page
             appWord = null;
 
         }
+      
 
+    }
+    //word转成pdf
+    /// <summary> 
+    /// 转换word为pdf 
+    /// </summary> 
+    /// <param name="filename">doc文件路径</param> 
+    /// <param name="savefilename">pdf保存路径</param> 
+    void ConvertWordPDF1(object filename, object savefilename)
+    {
+        object oTrue = true;
+        object oFalse = false;
+        object wordFile = filename;
+        object savefile = savefilename;
+        object oMissing = Missing.Value;
+        //定义WORD Application相关
+        Microsoft.Office.Interop.Word.Application appWord = new Microsoft.Office.Interop.Word.Application();
+        Object Nothing = System.Reflection.Missing.Value;
+        //创建一个名为WordApp的组件对象 
+        appWord = new ApplicationClass();
+        //创建一个名为WordDoc的文档对象并打开 
+        Microsoft.Office.Interop.Word.Document doc = appWord.Documents.Open(
+            ref wordFile,
+            ref oMissing,
+            ref oTrue,
+            ref oFalse,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing,
+            ref oMissing
+            );
+        //设置保存的格式 
+        object filefarmat = Microsoft.Office.Interop.Word.WdSaveFormat.wdFormatPDF;
+        //保存为PDF 
+        doc.SaveAs(ref savefile, ref filefarmat, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing, ref Nothing);
+        //关闭文档对象
+        doc.Close(ref Nothing, ref Nothing, ref Nothing);
+        //推出组建 
+        appWord.Quit(ref Nothing, ref Nothing, ref Nothing);
+        doc = null;
+        appWord = null;
     }
 
 
     /*打印pdf*/
-  
+
     // <param name="url">要打印的PDF路径</param>
     private void printPDF(string url)
     {
